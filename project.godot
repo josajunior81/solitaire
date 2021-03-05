@@ -23,10 +23,6 @@ config/icon="res://icon.png"
 
 window/size/height=768
 
-[editor_plugins]
-
-enabled=PoolStringArray( "codeandweb.texturepacker" )
-
 [rendering]
 
 vram_compression/import_etc=true
