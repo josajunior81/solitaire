@@ -5,6 +5,7 @@ signal init_card(pos)
 var drag_enabled = false
 var card_dragging
 export var speed = 75
+var y_pos = 0
 var last_position = Vector2(0,0)
 var open_position = Vector2(0,0)
 var reveal = false
@@ -25,20 +26,11 @@ func _input_event(viewport, event, shape_idx):
 			if event.pressed:
 				card_dragging = self
 				drag_enabled = true
-				last_position = position
 				get_parent().remove_child(self)
 				board_node.add_child(self)
 			else:
 				drag_enabled = false
-				get_parent().remove_child(self)
-				original_parent.add_child(self)
 										
-#func _input(event):
-#	if event is InputEventMouseButton:
-#		if event.button_index == BUTTON_LEFT and not event.pressed:
-#			drag_enabled = false
-
-			
 func _physics_process(delta):
 	var movement = Vector2()
 	
@@ -49,12 +41,10 @@ func _physics_process(delta):
 		if collision:
 			print("I collided with ", collision.collider.name)
 	else:
-		if flipped and card_dragging == self:
-			print(card_dragging)
-			card_dragging = null
-			$Tween.interpolate_property(self, "position", position, last_position, 0.2, Tween.TRANS_CUBIC, Tween.EASE_OUT)
+		if flipped and card_dragging == self:	
+			$Tween.interpolate_property(self, "position", position, last_position, 0.05, Tween.TRANS_LINEAR, Tween.EASE_OUT)
 			$Tween.start()
-
+			
 	input_pickable = flipped and on_top
 
 func _on_dock_card(body, position):
@@ -89,10 +79,19 @@ func _on_set_parent(card, parent):
 	if card == self:
 		original_parent = parent
 		
-func _on_set_last_position(card, pos):
+func _on_set_last_position(card, pos, y_padding):
 	if card == self:
 		last_position = pos
+		y_pos = y_padding
 
 func _on_set_card_on_top(card, is_on_top):
 	if card == self:
 		on_top = is_on_top
+
+
+func _on_card_tween_completed(object, key):
+	if object == self:
+		card_dragging = null		
+		self.position = Vector2(0, y_pos)
+		get_parent().remove_child(self)
+		original_parent.add_child(self)

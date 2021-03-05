@@ -14,7 +14,7 @@ signal reset_card(pos, card, suit, value)
 signal dock_card(card, node)
 signal flip_card(card, pos)
 signal set_card_parent(card, node)
-signal set_card_last_position(card, pos)
+signal set_card_last_position(card, pos, y_padding)
 signal set_card_on_top(card, on_top)
 
 func _ready():
@@ -49,7 +49,7 @@ func _ready():
 			card_posy = card_posy + 40
 			board_cards[index-1].append(card)
 			emit_signal("set_card_parent", card, node)
-			emit_signal("set_card_last_position", card, card.position)
+			emit_signal("set_card_last_position", card, card.global_position, card.position.y)
 			if (i+1) == index:
 				emit_signal("flip_card", card, Vector2(0,0))
 				emit_signal("set_card_on_top", card, true)
@@ -61,7 +61,7 @@ func _ready():
 		c.add_to_group("cards")
 		zindex = zindex + 1
 		emit_signal("set_card_parent", c, $Deck)
-		emit_signal("set_card_last_position", c, c.position)
+		emit_signal("set_card_last_position", c, c.global_position, 0)
 		
 	available_cards = cards
 	
@@ -78,7 +78,7 @@ func _on_next_card():
 		
 		emit_signal("flip_card", card, Vector2(0,0))
 		emit_signal("set_card_parent", card, $OpenCard)
-		emit_signal("set_card_last_position", card, card.position)
+		emit_signal("set_card_last_position", card, card.global_position, 0)
 		emit_signal("set_card_on_top", card, true)
 		
 		if open_cards.size() > 0:
@@ -94,7 +94,7 @@ func _on_next_card():
 				$OpenCard.remove_child(child)	
 				$Deck.add_child(child)
 				emit_signal("set_card_parent", child, $Deck)
-				emit_signal("set_card_last_position", child, child.position)
+				emit_signal("set_card_last_position", child, child.global_position, 0)
 				emit_signal("flip_card", child, Vector2(0,0))
 
 func _on_card_tween_completed(object, key):
