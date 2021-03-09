@@ -46,16 +46,20 @@ position = Vector2( 750, 350 )
 [node name="7_card" type="Position2D" parent="."]
 position = Vector2( 870, 350 )
 
-[node name="Area2D" parent="." instance=ExtResource( 5 )]
+[node name="1_dock" parent="." instance=ExtResource( 5 )]
 position = Vector2( 412, 120 )
 
-[node name="Area2D2" parent="." instance=ExtResource( 5 )]
-position = Vector2( 532, 120 )
+[node name="2_dock" parent="." instance=ExtResource( 5 )]
+position = Vector2( 562, 120 )
 
-[node name="Area2D3" parent="." instance=ExtResource( 5 )]
-position = Vector2( 652, 120 )
+[node name="3_dock" parent="." instance=ExtResource( 5 )]
+position = Vector2( 712, 120 )
 
-[node name="Area2D4" parent="." instance=ExtResource( 5 )]
-position = Vector2( 772, 120 )
+[node name="4_dock" parent="." instance=ExtResource( 5 )]
+position = Vector2( 862, 120 )
 [connection signal="next_card" from="Deck" to="." method="_on_next_card"]
 [connection signal="tween_completed" from="Tween" to="." method="_on_card_tween_completed"]
+[connection signal="body_shape_entered" from="1_dock" to="." method="_on_1_dock_body_shape_entered"]
+[connection signal="body_shape_entered" from="2_dock" to="." method="_on_2_dock_body_shape_entered"]
+[connection signal="body_shape_entered" from="3_dock" to="." method="_on_3_dock_body_shape_entered"]
+[connection signal="body_shape_entered" from="4_dock" to="." method="_on_4_dock_body_shape_entered"]

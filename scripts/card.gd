@@ -1,24 +1,30 @@
 extends KinematicBody2D
 
 signal init_card(pos)
+signal end_dragging(card)
+signal start_dragging()
 
-var drag_enabled = false
+export (int) var speed = 75
+export (int) var value = 0
+export (String) var suit = ""
+export var drag_enabled = false
+
 var card_dragging
-export var speed = 75
 var y_pos = 0
 var last_position = Vector2(0,0)
+var last_z_index = 0
 var open_position = Vector2(0,0)
 var reveal = false
 var flipped = false
 var on_top = false
 var board_node
 var original_parent
-var suit
-var value
 
 func _ready():
 	position = Vector2(0, 0)
-	board_node = get_node("/root/Board")
+	board_node = get_node("/root/Board")	
+	connect("start_dragging", board_node, "_on_start_dragging_card")
+	connect("end_dragging", board_node, "_on_end_dragging_card")
 	
 func _input_event(viewport, event, shape_idx):
 	if event is InputEventMouseButton:
@@ -28,8 +34,11 @@ func _input_event(viewport, event, shape_idx):
 				drag_enabled = true
 				get_parent().remove_child(self)
 				board_node.add_child(self)
+				z_index = 100
+				emit_signal("start_dragging")
 			else:
 				drag_enabled = false
+				emit_signal("end_dragging", self)
 										
 func _physics_process(delta):
 	var movement = Vector2()
@@ -47,11 +56,14 @@ func _physics_process(delta):
 			
 	input_pickable = flipped and on_top
 
-func _on_dock_card(body, position):
-	print(body)
-	print(self)
+func _on_dock_card(body, dock):
 	if self == body:
-		last_position = position
+		print(dock.position)
+		self.global_position = dock.position
+		self.last_position = dock.position
+		z_index = 1
+		card_dragging = null
+		drag_enabled = false
 
 func _on_init_card(pos, card, s, v):
 	if(card == self):
@@ -83,6 +95,7 @@ func _on_set_last_position(card, pos, y_padding):
 	if card == self:
 		last_position = pos
 		y_pos = y_padding
+		last_z_index = z_index
 
 func _on_set_card_on_top(card, is_on_top):
 	if card == self:
@@ -95,3 +108,4 @@ func _on_card_tween_completed(object, key):
 		self.position = Vector2(0, y_pos)
 		get_parent().remove_child(self)
 		original_parent.add_child(self)
+		z_index = last_z_index
